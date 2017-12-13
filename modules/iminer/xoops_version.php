@@ -85,13 +85,7 @@ $modversion['min_admin']      			= '1.1';
 
 // database tables
 $modversion["sqlfile"]["mysql"] 		= "sql/mysql.sql";
-$modversion["tables"] 					= array(
-												"iminer_categories",
-												"iminer_categories_link",
-												"iminer_tag",
-    											"iminer_link",
-    											"iminer_stats",
-											);
+$modversion["tables"] 					= array();
 
 // Main
 $modversion['hasMain'] 					= _MI_IMINER_HASMAIN;
@@ -174,6 +168,16 @@ $modversion["config"][] 				= array(
                                                 "valuetype"     => "text",
                                                 "default"       => ".rss",
                                                 "category"		=> "seo"
+                                            );
+
+$modversion["config"][] 				= array(
+                                                "name"          => "path",
+                                                "title"         => "_MI_IMINER_PATH",
+                                                "description"   => "_MI_IMINER_PATH_DESC",
+                                                "formtype"      => "textbox",
+                                                "valuetype"     => "text",
+                                                "default"       => dirname(__DIR__),
+                                                "category"		=> "mod"
                                             );
 
 $modversion["config"][] 				= array(
