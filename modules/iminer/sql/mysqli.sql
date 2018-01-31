@@ -6,12 +6,6 @@ CREATE TABLE `iminer_databasing` (
   `nickname` varchar(64) NOT NULL DEFAULT '',
   `watermarkid` int(8) NOT NULL DEFAULT '0',
   `modid` int(8) NOT NULL DEFAULT '0',
-  `table` varchar(128) NOT NULL DEFAULT '',
-  `identity` varchar(128) NOT NULL DEFAULT '',
-  `pharse` tinytext,
-  `userid` varchar(128) NOT NULL DEFAULT '',
-  `creating` varchar(128) NOT NULL DEFAULT '',
-  `updating` varchar(128) NOT NULL DEFAULT '',
   `atcount` mediumint(255) NOT NULL DEFAULT '0',
   `atunixtime` int(12) NOT NULL DEFAULT '0',
   `records` int(12) NOT NULL DEFAULT '0',
@@ -50,60 +44,79 @@ CREATE TABLE `iminer_databasing` (
   KEY `CLOCKWORK` (`key`,`nickname`,`watermarkid`,`modid`,`table`,`next`,`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `iminer_tabling` (
+  `tablingid` int(8) NOT NULL AUTO_INCREMENT,
+  `databasingid` int(8) NOT NULL DEFAULT '0',
+  `watermarkingid` int(8) NOT NULL DEFAULT '0',
+  `table` varchar(128) NOT NULL DEFAULT '',
+  `created` int(13) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tablingid`),
+  KEY `CLOCKWORK` (`databasingid`,`table`,`watermarkingid`,`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `iminer_fielding` (
+  `fieldingid` int(8) NOT NULL AUTO_INCREMENT,
+  `databasingid` int(8) NOT NULL DEFAULT '0',
+  `tablingid` int(8) NOT NULL DEFAULT '0',
+  `field` varchar(128) NOT NULL DEFAULT '',
+  `primary` varchar(128) NOT NULL DEFAULT '',
+  `unixtime` varchar(128) NOT NULL DEFAULT '',
+  `userid` varchar(128) NOT NULL DEFAULT '',
+  `identity` mediumint(255) NOT NULL DEFAULT '0',
+  `next` int(13) NOT NULL DEFAULT '0',
+  `created` int(13) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`fieldingid`),
+  KEY `CLOCKWORK` (`databasingid`,`tablingid`,`field`,`primary`,`unixtime`,`identity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `iminer_conditioning` (
+  `conditioningid` int(8) NOT NULL AUTO_INCREMENT,
+  `databasingid` int(8) NOT NULL DEFAULT '0',
+  `tablingid` int(8) NOT NULL DEFAULT '0',
+  `fieldingid` int(8) NOT NULL DEFAULT '0',
+  `field` varchar(128) NOT NULL DEFAULT '',
+  `logic` enum('LIKE', 'NOT LIKE', 'IN', 'NOT IN', '=', '>=', '<=', '<>') NOT NULL DEFAULT '=',
+  `condition` tinytext,
+  `created` int(13) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`conditioningid`),
+  KEY `CLOCKWORK` (`databasingid`,`tablingid`,`fieldingid`,`field`,`logic`,`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `iminer_imagery` (
   `imageid` mediumint(255) NOT NULL AUTO_INCREMENT,
-  `piid` mediumint(255) NOT NULL,
+  `key` varchar(44) NOT NULL DEFAULT '',
+  `sourceid` mediumint(255) NOT NULL DEFAULT '0',
+  `localid` mediumint(255) NOT NULL DEFAULT '0',
   `typal` enum('icon','small','medium','large','') NOT NULL DEFAULT '',
   `mode` enum('retrieving','staging','staged','updating','patching') NOT NULL DEFAULT 'retrieving',
   `modid` int(8) NOT NULL DEFAULT '0',
   `databaseid` int(8) NOT NULL DEFAULT '0',
+  `tablingid` int(8) NOT NULL DEFAULT '0',
+  `fieldingid` int(8) NOT NULL DEFAULT '0',
   `uid` int(13) NOT NULL DEFAULT '0',
   `messaged` int(13) NOT NULL DEFAULT '0',
-  `identity` mediumint(255) NOT NULL,
-  `field` varchar(128) NOT NULL DEFAULT '',
-  `key` varchar(44) NOT NULL DEFAULT '',
+  `identity` int(13) NOT NULL DEFAULT '0',
   `created` int(13) NOT NULL DEFAULT '0',
   `sleeping` int(13) NOT NULL DEFAULT '0',
   PRIMARY KEY (`imageid`),
-  KEY `CLOCKWORK` (`typal`,`mode`,`databaseid`,`identity`,`key`,`field`)
+  KEY `CLOCKWORK` (`typal`,`mode`,`databaseid`,`identity`,`key`,`fieldingid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-CREATE TABLE `iminer_imagery_locals` (
-  `imagerylocalid` mediumint(255) NOT NULL AUTO_INCREMENT,
-  `imageryid` mediumint(255) NOT NULL DEFAULT '0',
-  `localid` mediumint(255) NOT NULL DEFAULT '0',
-  `created` int(13) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`imagerylocalid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-CREATE TABLE `iminer_imagery_sources` (
-  `imagerysourceid` mediumint(255) NOT NULL AUTO_INCREMENT,
-  `imageryid` mediumint(255) NOT NULL DEFAULT '0',
-  `sourceid` mediumint(255) NOT NULL DEFAULT '0',
-  `created` int(13) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`imagerysourceid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE `iminer_locals` (
   `localid` mediumint(255) NOT NULL AUTO_INCREMENT,
   `mimetypeid` int(8) NOT NULL,
-  `local-path` varchar(255) NOT NULL DEFAULT '',
-  `local-filename` varchar(128) NOT NULL DEFAULT '',
-  `local-bytes` int(20) NOT NULL DEFAULT '0',
-  `local-hits` int(13) NOT NULL DEFAULT '0',
-  `local-sent` int(13) NOT NULL DEFAULT '0',
-  `local-width` int(8) NOT NULL DEFAULT '0',
-  `local-height` int(8) NOT NULL DEFAULT '0',
-  `local-type` enum('gif','jpg','png') NOT NULL DEFAULT 'png',
-  `local-md5` varchar(32) NOT NULL DEFAULT '',
+  `image` longblob,
+  `key` varchar(44) NOT NULL DEFAULT '',
+  `bytes` int(20) NOT NULL DEFAULT '0',
+  `hits` int(13) NOT NULL DEFAULT '0',
+  `sent` int(13) NOT NULL DEFAULT '0',
+  `width` int(8) NOT NULL DEFAULT '0',
+  `height` int(8) NOT NULL DEFAULT '0',
+  `type` enum('gif','jpg','png') NOT NULL DEFAULT 'png',
+  `md5` varchar(32) NOT NULL DEFAULT '',
   `created` int(13) NOT NULL DEFAULT '0',
   PRIMARY KEY (`localid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE `iminer_mimetypes` (
   `id` int(8) unsigned NOT NULL AUTO_INCREMENT,
@@ -124,43 +137,45 @@ CREATE TABLE `iminer_mimetypes` (
   KEY `SEARCH` (`mimetype`,`accessed`,`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `iminer_sources` (
   `sourceid` mediumint(255) NOT NULL AUTO_INCREMENT,
   `localid` mediumint(255) NOT NULL,
   `mimetypeid` int(8) NOT NULL,
   `source` tinytext,
-  `source-state` enum('online','offline','changling') NOT NULL DEFAULT 'online',
-  `source-bytes` int(20) NOT NULL DEFAULT '0',
-  `source-hits` int(13) NOT NULL DEFAULT '0',
-  `source-recieved` int(13) NOT NULL DEFAULT '0',
-  `source-width` int(8) NOT NULL DEFAULT '0',
-  `source-height` int(8) NOT NULL DEFAULT '0',
-  `source-type` enum('gif','jpg','png','other') NOT NULL DEFAULT 'other',
-  `source-md5` varchar(32) NOT NULL DEFAULT '',
-  `source-identical` int(13) NOT NULL DEFAULT '0',
-  `source-changes` int(13) NOT NULL DEFAULT '0',
-  `source-compared` int(13) NOT NULL DEFAULT '0',
-  `source-checking` int(13) NOT NULL DEFAULT '0',
-  `source-offlined` int(13) NOT NULL DEFAULT '0',
+  `state` enum('online','stalled','offline','changling') NOT NULL DEFAULT 'online',
+  `bytes` int(20) NOT NULL DEFAULT '0',
+  `hits` int(13) NOT NULL DEFAULT '0',
+  `recieved` int(13) NOT NULL DEFAULT '0',
+  `width` int(8) NOT NULL DEFAULT '0',
+  `height` int(8) NOT NULL DEFAULT '0',
+  `type` enum('gif','jpg','png','') NOT NULL DEFAULT '',
+  `md5` varchar(32) NOT NULL DEFAULT '',
+  `identical` int(13) NOT NULL DEFAULT '0',
+  `changes` int(13) NOT NULL DEFAULT '0',
+  `compared` int(13) NOT NULL DEFAULT '0',
+  `checking` int(13) NOT NULL DEFAULT '0',
+  `offlined` int(13) NOT NULL DEFAULT '0',
   `created` int(13) NOT NULL DEFAULT '0',
   PRIMARY KEY (`sourceid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `iminer_watermarkings` (
-  `watermarkid` int(8) NOT NULL DEFAULT '0',
-  `localid` mediumint(255) NOT NULL DEFAULT '0',
-  `key` varchar(44) NOT NULL DEFAULT '',
+  `watermarkid` int(8) NOT NULL AUTO_INCREMENT,
+  `path` varchar(128) NOT NULL DEFAULT '',
+  `filename` varchar(128) NOT NULL DEFAULT '',
+  `alias` varchar(64) NOT NULL DEFAULT '',
   `hits` int(12) NOT NULL DEFAULT '0',
   `marks` int(12) NOT NULL DEFAULT '0',
   `bytes` int(12) NOT NULL DEFAULT '0',
   `width` int(8) NOT NULL DEFAULT '0',
   `height` int(8) NOT NULL DEFAULT '0',
   `typal` enum('gif','jpg','png') NOT NULL DEFAULT 'png',
-  `physicality` enum('top left','top right','bottom left','bottom right','center','tiled') NOT NULL DEFAULT 'bottom right',
+  `physicality` enum('top left','top right','bottom left','bottom right','center','tiled','randoms') NOT NULL DEFAULT 'bottom right',
   `opacity` float(10,4) NOT NULL DEFAULT '0.6669',
+  `scale` float(10,4) NOT NULL DEFAULT '4.8888',
   `created` int(11) NOT NULL DEFAULT '0',
-  `accessed` int(11) NOT NULL DEFAULT '0'
+  `accessed` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`watermarkid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `iminer_watermarkings` (`path`, `filename`, `alias`, `bytes`, `width`, `height`, `typal`, `physicality`, `opacity`, `created`) VALUES ('/uploads/iminer', 'xoops_watermark.gif', 'XOOPS Bottom Right', '17906', '260', '260', 'gif', 'bottom right', '0.45637', UNIX_TIMESTAMP()), ('/uploads/iminer', 'xoops_watermark.gif', 'XOOPS Center', '17906', '260', '260', 'gif', 'center', '0.45637', UNIX_TIMESTAMP()), ('/uploads/iminer', 'xoops_watermark.gif', 'XOOPS Tiled', '17906', '260', '260', 'gif', 'tiled', '0.45637', UNIX_TIMESTAMP()), ('/uploads/iminer', 'xoops_watermark.gif', 'XOOPS Randoms', '17906', '260', '260', 'gif', 'randoms', '0.45637', UNIX_TIMESTAMP()); 
